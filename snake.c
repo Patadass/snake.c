@@ -31,8 +31,6 @@
 #include <sys/wait.h>
 #include <errno.h>
 
-#define STATUS_END_GAME 255
-
 const uint8_t HEIGHT = 20;
 const uint8_t WIDTH  = 40;
 
@@ -118,8 +116,8 @@ void input_handle(){
     EXIT_STATUS = 0;
 
     int stat;
-    wait(&stat);
-    int key = WEXITSTATUS(stat);
+    wait(&stat); // wait for child process thats lisening for key press
+    int key = WEXITSTATUS(stat); // get key pressed
 
     EXIT_STATUS = key;
 }
@@ -227,9 +225,9 @@ void signal_callback_handler(int signum){
 int main(){
 
     printf("\033[?25l\033[2J"); // make cursor invisible and clear screen
+
     signal(SIGINT, signal_callback_handler);
     set_buffered_input(false);
-
 
     scord_t snake[HEIGHT * (WIDTH / 2)];
     scord_t apple;
@@ -241,8 +239,14 @@ int main(){
 
     init_snake(snake, &size, &apple);
 
-
     pid_t p;
+    /*
+        TODO: change from signal() to sigaction()
+        from www.man7.org/linux/man-pages/man2/signal.2.html
+        WARNING: the behavior of signal() varies across UNIX versions, and
+        has also varied historically across different versions of Linux.
+        Avoid its use: use sigaction(2) instead.
+     */
     signal(SIGCHLD, input_handle);
 
     while(true){
