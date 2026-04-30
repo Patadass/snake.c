@@ -112,7 +112,7 @@ void draw_game(scord_t snake[], uint8_t size, scord_t apple){
 }
 
 uint8_t EXIT_STATUS = 0;
-void input_handle(){
+void input_handle(int signum){
 
     EXIT_STATUS = 0;
 
