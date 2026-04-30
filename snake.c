@@ -34,17 +34,19 @@
 const uint8_t HEIGHT = 20;
 const uint8_t WIDTH  = 40;
 
+/* struct for cordiantes of snake and apple */
 typedef struct scord_t{
     uint8_t x;
     uint8_t y;
 } scord_t;
 
+/* struct for moving direction of snake */
 typedef struct mcord_t{
     int8_t x;
     int8_t y;
 } mcord_t;
 
-// init snake body and starting apple position
+/* init snake body and starting apple position */
 void init_snake(scord_t snake[], uint8_t* size, scord_t* apple){
 
     *size      = 4;
@@ -93,21 +95,20 @@ void draw_game(scord_t snake[], uint8_t size, scord_t apple){
     printf("quit:\tq\n");
     printf("pause:\tesc, p\n");
 
-    // print apple
+    /* print apple */
     printf("\033[31m"); // color red
     printf("\033[%d;%dHO", apple.y + 1, apple.x * 2 + 1);
 
-    //print body then head looks better when coliding with head with body
+    /* print body then head, looks better when colliding head with body */
     printf("\033[32m"); // color green
     for(i = 1; i < size;i++){
-        // move cursor and print [] or () if head
         printf("\033[%d;%dH[]", snake[i].y + 1, snake[i].x * 2 + 1);
     }
     printf("\033[%d;%dH()", snake[0].y + 1, snake[0].x * 2 + 1);
 
     printf("\033[0m"); // reset color
 
-    fflush(stdout); // force flush stdout
+    fflush(stdout);    // force flush stdout
 }
 
 uint8_t EXIT_STATUS = 0;
@@ -116,7 +117,7 @@ void input_handle(){
     EXIT_STATUS = 0;
 
     int stat;
-    wait(&stat); // wait for child process thats lisening for key press
+    wait(&stat);                 // wait for child process thats lisening for key press
     int key = WEXITSTATUS(stat); // get key pressed
 
     EXIT_STATUS = key;
@@ -156,7 +157,7 @@ uint8_t move_snake(scord_t snake[], uint8_t* size, scord_t* apple, mcord_t dir){
 
     for(i = *size - 1; i >= 1; i--){
         if(snake[0].x == snake[i].x && snake[0].y == snake[i].y){
-            return 1;//colision with body
+            return 1; //colision with body
         }
         snake[i].x = snake[i - 1].x;
         snake[i].y = snake[i - 1].y;
@@ -167,7 +168,7 @@ uint8_t move_snake(scord_t snake[], uint8_t* size, scord_t* apple, mcord_t dir){
     return 0;
 }
 
-// sleep for msec miliseconds
+/* sleep for msec miliseconds */
 int msleep(long msec){
     struct timespec ts;
     int res;
@@ -188,7 +189,7 @@ int msleep(long msec){
     return res;
 }
 
-// set buffered input
+/* set buffered input */
 void set_buffered_input(bool enable){
 
     static bool    enabled = true;
@@ -197,17 +198,17 @@ void set_buffered_input(bool enable){
 
     if(enable && !enabled){
 
-        //restore old setting
+        /* restore old setting */
         tcsetattr(STDIN_FILENO, TCSANOW, &old);
         enabled = true;
 
     }else if(!enable && enabled){
 
-        // get the terminal settings for standard input
+        /* get the terminal settings for standard input */
         tcgetattr(STDIN_FILENO, &new);
         old = new;
 
-        // disable canonical mode (buffered i/o) and local echo
+        /* disable canonical mode (buffered i/o) and local echo */
         new.c_lflag &= (~ICANON & ~ECHO);
         tcsetattr(STDIN_FILENO, TCSANOW, &new);
 
@@ -217,7 +218,7 @@ void set_buffered_input(bool enable){
 
 void signal_callback_handler(int signum){
     printf("\033[%d;%dH", HEIGHT + 2, 0); // move cursor to end of board
-    printf("\033[?25h\n"); // make cursor visible
+    printf("\033[?25h\n");                // make cursor visible
     set_buffered_input(true);
     exit(signum);
 }
@@ -321,6 +322,6 @@ int main(){
     }
 
     printf("\033[%d;%dH", HEIGHT + 4, 0); // move cursor to end
-    printf("\033[?25h\033[2;0;0m\n"); // make cursor visible, reset color
+    printf("\033[?25h\033[2;0;0m\n");     // make cursor visible, reset color
     set_buffered_input(true);
 }
