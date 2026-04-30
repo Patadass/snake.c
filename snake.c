@@ -91,9 +91,9 @@ void draw_game(scord_t snake[], uint8_t size, scord_t apple){
         printf("\n");
     }
 
-    printf("\nmove:\twasd, hjkl or ← ↑ ↓ →\n");
+    printf("\nmove:\twasd or hjkl\n");
     printf("quit:\tq\n");
-    printf("pause:\tesc, p\n");
+    printf("pause:\tp\n");
 
     /* print apple */
     printf("\033[31m"); // color red
@@ -273,32 +273,26 @@ int main(){
 
         bool leave = false;
         switch(EXIT_STATUS){
-            case 65: // up arrow
             case 'k':
             case 'w':
                 dir.x = 0;
                 dir.y = -1;
             break;
-            case 66: // down arrow
             case 'j':
             case 's':
                 dir.x = 0;
                 dir.y = 1;
             break;
-            case 67: // right arrow
             case 'l':
             case 'd':
                 dir.x = 1;
                 dir.y = 0;
             break;
-            break;
-            case 68: // left arrow
             case 'h':
             case 'a':
                 dir.x = -1;
                 dir.y = 0;
             break;
-            case 27: // esc key
             case 'p':
                 printf("\033[%d;%dHPUASE", HEIGHT / 2, WIDTH / 2);
                 EXIT_STATUS = getchar();
