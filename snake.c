@@ -112,7 +112,7 @@ void draw_game(scord_t snake[], uint8_t size, scord_t apple){
 }
 
 uint8_t EXIT_STATUS = 0;
-void input_handle(int signum){
+void input_handle(int signo, siginfo_t* info, void* context){
 
     EXIT_STATUS = 0;
 
@@ -240,15 +240,21 @@ int main(){
 
     init_snake(snake, &size, &apple);
 
-    pid_t p;
     /*
-        TODO: change from signal() to sigaction()
         from www.man7.org/linux/man-pages/man2/signal.2.html
         WARNING: the behavior of signal() varies across UNIX versions, and
         has also varied historically across different versions of Linux.
         Avoid its use: use sigaction(2) instead.
      */
-    signal(SIGCHLD, input_handle);
+    struct sigaction act = { 0 };
+    act.sa_flags = SA_SIGINFO;
+    act.sa_sigaction = &input_handle;
+    if(sigaction(SIGCHLD, &act, NULL) == -1){
+        perror("sigaction");
+        exit(EXIT_FAILURE);
+    }
+
+    pid_t p;
 
     while(true){
 
