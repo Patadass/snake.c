@@ -77,15 +77,25 @@ void draw_game(scord_t snake[], uint8_t size, scord_t apple){
     for(i = 0; i < HEIGHT; i++){
         for(j = 0; j < WIDTH; j++){
             if(j == 0){
-                printf("|");
-            } 
-            if(i == 0 || i + 1 >= HEIGHT){
-                printf("-");
+                if(i == 0){
+                    printf("┌");
+                }else if(i + 1 >= HEIGHT){
+                    printf("└");
+                }else{
+                    printf("│");
+                }
+            }else if(j + 1 >= WIDTH){
+                if(i == 0){
+                    printf("┐");
+                }else if(i + 1 >= HEIGHT){
+                    printf("┘");
+                }else{
+                    printf("│");
+                }
+            }else if(i == 0 || i + 1 >= HEIGHT){
+                printf("─");
             }else{
                 printf(" ");
-            }
-            if(j + 1 >= WIDTH){
-                printf("|");
             }
         }
         printf("\n");
@@ -134,7 +144,7 @@ uint8_t move_snake(scord_t snake[], uint8_t* size, scord_t* apple, mcord_t dir){
     if(snake[0].y == 0){
         return 1;
     }
-    if(snake[0].x * 2 >= WIDTH){
+    if(snake[0].x * 2 + 2 >= WIDTH){
         return 1;
     }
     if(snake[0].y + 1 >= HEIGHT){
