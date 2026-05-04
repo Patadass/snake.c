@@ -294,23 +294,31 @@ int main(){
         switch(EXIT_STATUS){
             case 'k':
             case 'w':
-                dir.x = 0;
-                dir.y = -1;
+                if(dir.y != 1){
+                    dir.x = 0;
+                    dir.y = -1;
+                }
             break;
             case 'j':
             case 's':
-                dir.x = 0;
-                dir.y = 1;
+                if(dir.y != -1){
+                    dir.x = 0;
+                    dir.y = 1;
+                }
             break;
             case 'l':
             case 'd':
-                dir.x = 1;
-                dir.y = 0;
+                if(dir.x != -1){
+                    dir.x = 1;
+                    dir.y = 0;
+                }
             break;
             case 'h':
             case 'a':
-                dir.x = -1;
-                dir.y = 0;
+                if(dir.x != 1){
+                    dir.x = -1;
+                    dir.y = 0;
+                }
             break;
             case 'p':
                 printf("\033[%d;%dHPAUSE", HEIGHT / 2, WIDTH / 2);
