@@ -105,6 +105,8 @@ void draw_game(scord_t snake[], uint8_t size, scord_t apple){
     printf("quit:\tq\n");
     printf("pause:\tp\n");
 
+    printf("\033[0;2Hsnake.c");
+
     /* print apple */
     printf("\033[31m"); // color red
     printf("\033[%d;%dHO", apple.y + 1, apple.x * 2 + 1);
@@ -117,6 +119,7 @@ void draw_game(scord_t snake[], uint8_t size, scord_t apple){
     printf("\033[%d;%dH()", snake[0].y + 1, snake[0].x * 2 + 1);
 
     printf("\033[0m"); // reset color
+
 
     fflush(stdout);    // force flush stdout
 }
