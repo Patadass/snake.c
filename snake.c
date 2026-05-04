@@ -321,7 +321,7 @@ int main(){
                 }
             break;
             case 'p':
-                printf("\033[%d;%dHPAUSE", HEIGHT / 2, WIDTH / 2);
+                printf("\033[%d;%dHPAUSE", HEIGHT / 2, WIDTH / 2 - 2);
                 EXIT_STATUS = getchar();
                 if(EXIT_STATUS == 'q'){
                     leave = true;
