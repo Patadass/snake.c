@@ -34,7 +34,7 @@
 const uint8_t HEIGHT = 20;
 const uint8_t WIDTH  = 40;
 
-/* struct for cordiantes of snake and apple */
+/* struct for coordinates of snake and apple */
 typedef struct scord_t{
     uint8_t x;
     uint8_t y;
@@ -130,7 +130,7 @@ void input_handle(int signo, siginfo_t* info, void* context){
     EXIT_STATUS = 0;
 
     int stat;
-    wait(&stat);                 // wait for child process thats lisening for key press
+    wait(&stat);                 // wait for child process that's listening for key press
     int key = WEXITSTATUS(stat); // get key pressed
 
     EXIT_STATUS = key;
@@ -156,7 +156,7 @@ uint8_t move_snake(scord_t snake[], uint8_t* size, scord_t* apple, mcord_t dir){
 
     if(snake[0].x == apple->x && snake[0].y == apple->y){
 
-        // TODO: dont allow apple to spawn inside of snake
+        // TODO: don't allow apple to spawn inside of snake
         apple->x = rand() % (HEIGHT - 2) + 1;
         apple->y = rand() % (WIDTH / 2 - 2) + 1;
         
@@ -170,7 +170,7 @@ uint8_t move_snake(scord_t snake[], uint8_t* size, scord_t* apple, mcord_t dir){
 
     for(i = *size - 1; i >= 1; i--){
         if(snake[0].x == snake[i].x && snake[0].y == snake[i].y){
-            return 1; //colision with body
+            return 1; //collision with body
         }
         snake[i].x = snake[i - 1].x;
         snake[i].y = snake[i - 1].y;
@@ -181,7 +181,7 @@ uint8_t move_snake(scord_t snake[], uint8_t* size, scord_t* apple, mcord_t dir){
     return 0;
 }
 
-/* sleep for msec miliseconds */
+/* sleep for msec milliseconds */
 int msleep(long msec){
     struct timespec ts;
     int res;
