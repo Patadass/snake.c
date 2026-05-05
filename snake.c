@@ -140,7 +140,6 @@ uint8_t move_snake(scord_t snake[], uint8_t* size, scord_t* apple, mcord_t dir){
 
     uint8_t i;
 
-    //TODO: fix collision 
     if(snake[0].x == 0){
         return 1;
     }
@@ -156,9 +155,23 @@ uint8_t move_snake(scord_t snake[], uint8_t* size, scord_t* apple, mcord_t dir){
 
     if(snake[0].x == apple->x && snake[0].y == apple->y){
 
-        // TODO: don't allow apple to spawn inside of snake
-        apple->x = rand() % (HEIGHT - 2) + 1;
-        apple->y = rand() % (WIDTH / 2 - 2) + 1;
+
+        // TODO: make getting random apple position faster
+        bool in_snake;
+
+        do{
+
+            apple->x = rand() % (HEIGHT - 2) + 1;
+            apple->y = rand() % (WIDTH / 2 - 2) + 1;
+            in_snake = false;
+            for(i = 0; i < *size; i++){
+                if(snake[i].x == apple->x && snake[i].y == apple->y){
+                    in_snake = true;
+                    break;
+                }
+            }
+
+        }while(in_snake);
         
         if(*size + 1 > HEIGHT * (WIDTH / 2)){
             return 1;
