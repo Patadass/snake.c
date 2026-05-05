@@ -242,18 +242,40 @@ void set_buffered_input(bool enable){
     }
 }
 
-void signal_callback_handler(int signum){
-    printf("\033[%d;%dH", HEIGHT + 2, 0); // move cursor to end of board
+// void input_handle(int signo, siginfo_t* info, void* context){
+void signal_callback_handler(int signo, siginfo_t* info, void* context){
+    printf("\033[%d;%dH", HEIGHT + 4, 0); // move cursor to end of board
     printf("\033[?25h\n");                // make cursor visible
     set_buffered_input(true);
-    exit(signum);
+    exit(signo);
 }
 
 int main(){
 
+    /*
+        from www.man7.org/linux/man-pages/man2/signal.2.html
+        WARNING: the behavior of signal() varies across UNIX versions, and
+        has also varied historically across different versions of Linux.
+        Avoid its use: use sigaction(2) instead.
+     */
+    struct sigaction act_interupt = { 0 };
+    act_interupt.sa_flags = SA_SIGINFO;
+    act_interupt.sa_sigaction = &signal_callback_handler;
+    if(sigaction(SIGINT, &act_interupt, NULL) == -1){
+        perror("sigaction");
+        exit(EXIT_FAILURE);
+    }
+
+    struct sigaction act_input = { 0 };
+    act_input.sa_flags = SA_SIGINFO;
+    act_input.sa_sigaction = &input_handle;
+    if(sigaction(SIGCHLD, &act_input, NULL) == -1){
+        perror("sigaction");
+        exit(EXIT_FAILURE);
+    }
+
     printf("\033[?25l\033[2J"); // make cursor invisible and clear screen
 
-    signal(SIGINT, signal_callback_handler);
     set_buffered_input(false);
 
     scord_t snake[HEIGHT * (WIDTH / 2)];
@@ -265,20 +287,6 @@ int main(){
     dir.y = 0;
 
     init_snake(snake, &size, &apple);
-
-    /*
-        from www.man7.org/linux/man-pages/man2/signal.2.html
-        WARNING: the behavior of signal() varies across UNIX versions, and
-        has also varied historically across different versions of Linux.
-        Avoid its use: use sigaction(2) instead.
-     */
-    struct sigaction act = { 0 };
-    act.sa_flags = SA_SIGINFO;
-    act.sa_sigaction = &input_handle;
-    if(sigaction(SIGCHLD, &act, NULL) == -1){
-        perror("sigaction");
-        exit(EXIT_FAILURE);
-    }
 
     pid_t p;
 
