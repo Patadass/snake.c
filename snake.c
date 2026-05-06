@@ -23,6 +23,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
+#include <ctype.h>
 #include <unistd.h>
 #include <time.h>
 #include <termios.h>
@@ -30,6 +32,11 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <errno.h>
+#include <err.h>
+
+#define SLOW   300
+#define MEDIUM 200
+#define FAST   100
 
 const uint8_t HEIGHT = 20;
 const uint8_t WIDTH  = 40;
@@ -250,8 +257,41 @@ void signal_callback_handler(int signo, siginfo_t* info, void* context){
     exit(signo);
 }
 
-int main(){
+int main(int argc, char** argv){
 
+    uint16_t sleep_for = MEDIUM;
+
+    if(argc > 1){
+        uint8_t i = 0;
+        if(atoi(argv[1]) != 0){
+            if(atoi(argv[1]) > 0){
+                sleep_for = atoi(argv[1]);
+            }else{
+                errx(EXIT_FAILURE, "speed must be a positive number");
+            }
+            goto skip_comp;
+        }
+        while(argv[1][i] != '\0'){
+            argv[1][i] = tolower(argv[1][i]);
+            i++;
+        }
+        if(strcmp(argv[1], "slow") == 0){
+            sleep_for = SLOW;
+        }else if(strcmp(argv[1], "medium") == 0){
+            sleep_for = MEDIUM;
+        }else if(strcmp(argv[1], "fast") == 0){
+            sleep_for = FAST;
+        }else{
+            EXIT_STATUS = EXIT_FAILURE;
+            if(strcmp(argv[1], "help") == 0){
+                EXIT_STATUS = EXIT_SUCCESS;
+            }
+            errx(EXIT_STATUS, "snake [fast|medium|slow|<speed in ms>]\n");
+        }
+    }
+
+skip_comp:
+    
     /*
         from www.man7.org/linux/man-pages/man2/signal.2.html
         WARNING: the behavior of signal() varies across UNIX versions, and
@@ -290,6 +330,8 @@ int main(){
 
     pid_t p;
 
+    draw_game(snake, size, apple);
+
     while(true){
 
         p = fork();
@@ -305,7 +347,7 @@ int main(){
 
         uint8_t hit = 0;
         while(EXIT_STATUS == 0 && hit == 0){
-            msleep(250);
+            msleep(sleep_for);
             hit = move_snake(snake, &size, &apple, dir);
             draw_game(snake, size, apple);
         }
