@@ -41,6 +41,8 @@
 const uint8_t HEIGHT = 20;
 const uint8_t WIDTH  = 40;
 
+uint8_t SCORE = 0;
+
 /* struct for coordinates of snake and apple */
 typedef struct scord_t{
     uint8_t x;
@@ -113,6 +115,7 @@ void draw_game(scord_t snake[], uint8_t size, scord_t apple){
     printf("pause:\tp\n");
 
     printf("\033[0;2Hsnake.c");
+    printf("\033[0;%dHScore:%3d", WIDTH - 9, SCORE);
 
     /* print apple */
     printf("\033[31m"); // color red
@@ -186,6 +189,8 @@ uint8_t move_snake(scord_t snake[], uint8_t* size, scord_t* apple, mcord_t dir){
         snake[*size].x = snake[*size - 1].x + dir.x;
         snake[*size].y = snake[*size - 1].y + dir.y;
         *size += 1;
+
+        SCORE++;
     }
 
     for(i = *size - 1; i >= 1; i--){
