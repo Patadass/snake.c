@@ -12,3 +12,7 @@ run
 ```bash
 ./snake
 ```
+help message
+```bash
+./snake help
+```
