@@ -34,9 +34,9 @@
 #include <errno.h>
 #include <err.h>
 
-#define SLOW   300
-#define MEDIUM 200
-#define FAST   100
+#define SLOW   150
+#define MEDIUM 100
+#define FAST   50
 
 const uint8_t HEIGHT = 20;
 const uint8_t WIDTH  = 40;
@@ -346,9 +346,15 @@ skip_comp:
         }
 
         uint8_t hit = 0;
+        uint8_t scount = 2;
         while(EXIT_STATUS == 0 && hit == 0){
+            /* move snake once per 2 cycles, makes input smoother*/
+            if(scount >= 2){
+                hit = move_snake(snake, &size, &apple, dir);
+                scount = 0;
+            }
             msleep(sleep_for);
-            hit = move_snake(snake, &size, &apple, dir);
+            scount++;
             draw_game(snake, size, apple);
         }
 
