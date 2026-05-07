@@ -41,7 +41,7 @@
 const uint8_t HEIGHT = 20;
 const uint8_t WIDTH  = 40;
 
-uint8_t SCORE = 0;
+uint16_t SCORE = 0;
 
 /* struct for coordinates of snake and apple */
 typedef struct scord_t{
