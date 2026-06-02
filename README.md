@@ -4,11 +4,11 @@ console version of snake for GNU/linux
 
 ![snake](https://github.com/Patadass/snake.c/blob/main/snake.png?raw=true)
 
-compile
+## build
+
 ```bash
 make
 ```
-run
 ```bash
 ./snake
 ```
