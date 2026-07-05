@@ -40,6 +40,7 @@
 
 const uint8_t HEIGHT = 20;
 const uint8_t WIDTH  = 40;
+const uint8_t SIZE_OF_CELL = 2;
 
 uint16_t SCORE = 0;
 
@@ -55,15 +56,17 @@ typedef struct mcord_t{
     int8_t y;
 } mcord_t;
 
-/* init snake body and starting apple position */
-void init_snake(scord_t snake[], uint8_t* size, scord_t* apple){
+void init_apple(scord_t* apple){
+    uint8_t offset = 5;
+    apple->y = HEIGHT / 2;
+    apple->x = (WIDTH / (SIZE_OF_CELL * 2)) + offset;
+}
 
-    *size      = 4;
-    apple->y   = HEIGHT / 2;
-    apple->x   = WIDTH  / 4 + 5;
-
+void init_snake(scord_t snake[], uint8_t* size){
+    *size = 4;
+    uint8_t offset = 5;
     snake[0].y = HEIGHT / 2;
-    snake[0].x = WIDTH  / 4 - 5;
+    snake[0].x = (WIDTH / (SIZE_OF_CELL * 2)) - offset;
 
     uint8_t i;
 
@@ -71,10 +74,14 @@ void init_snake(scord_t snake[], uint8_t* size, scord_t* apple){
         snake[i].x = snake[i - 1].x - 1;
         snake[i].y = snake[i - 1].y;
     }
+}
+
+void init_game(scord_t snake[], uint8_t* size, scord_t* apple){
+    init_snake(snake, size);
+    init_apple(apple);
 
     srand(time(NULL)); // set seed for rand()
 }
-
 
 void draw_game(scord_t snake[], uint8_t size, scord_t apple){
 
@@ -331,7 +338,7 @@ skip_comp:
     dir.x = 1;
     dir.y = 0;
 
-    init_snake(snake, &size, &apple);
+    init_game(snake, &size, &apple);
 
     pid_t p;
 
