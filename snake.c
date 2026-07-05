@@ -83,11 +83,8 @@ void init_game(scord_t snake[], uint8_t* size, scord_t* apple){
     srand(time(NULL)); // set seed for rand()
 }
 
-void draw_game(scord_t snake[], uint8_t size, scord_t apple){
-
-    uint8_t i;
-    uint8_t j;
-
+void draw_border(){
+    uint8_t i, j;
     printf("\033[H"); // move cursor to 0, 0
 
     for(i = 0; i < HEIGHT; i++){
@@ -116,28 +113,43 @@ void draw_game(scord_t snake[], uint8_t size, scord_t apple){
         }
         printf("\n");
     }
+}
 
+void draw_controls(){
     printf("\nmove:\twasd or hjkl\n");
     printf("quit:\tq\n");
     printf("pause:\tp\n");
+}
 
+void draw_header(){
+    uint8_t offset = 9;
     printf("\033[0;2Hsnake.c");
-    printf("\033[0;%dHScore:%3d", WIDTH - 9, SCORE);
+    printf("\033[0;%dHScore:%3d", WIDTH - offset, SCORE);
+}
 
-    /* print apple */
+void draw_apple(scord_t apple){
     printf("\033[31m"); // color red
-    printf("\033[%d;%dHO", apple.y + 1, apple.x * 2 + 1);
+    printf("\033[%d;%dHO", apple.y + 1, apple.x * SIZE_OF_CELL + 1);
+}
 
+void draw_snake(scord_t snake[], uint8_t size){
+    uint8_t i;
     /* print body then head, looks better when colliding head with body */
     printf("\033[32m"); // color green
     for(i = 1; i < size;i++){
-        printf("\033[%d;%dH[]", snake[i].y + 1, snake[i].x * 2 + 1);
+        printf("\033[%d;%dH[]", snake[i].y + 1, snake[i].x * SIZE_OF_CELL + 1);
     }
-    printf("\033[%d;%dH()", snake[0].y + 1, snake[0].x * 2 + 1);
+    printf("\033[%d;%dH()", snake[0].y + 1, snake[0].x * SIZE_OF_CELL + 1);
 
     printf("\033[0m"); // reset color
+}
 
-
+void draw_game(scord_t snake[], uint8_t size, scord_t apple){
+    draw_border();
+    draw_controls();
+    draw_header();
+    draw_apple(apple);
+    draw_snake(snake, size);
     fflush(stdout);    // force flush stdout
 }
 
