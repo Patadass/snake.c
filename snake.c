@@ -285,10 +285,9 @@ void set_buffered_input(bool enable){
     }
 }
 
-// void input_handle(int signo, siginfo_t* info, void* context){
 void signal_callback_handler(int signo, siginfo_t* info, void* context){
     printf("\033[%d;%dH", HEIGHT + 4, 0); // move cursor to end of board
-    printf("\033[?25h\n");                // make cursor visible
+    printf("\033[?25h\n"); // make cursor visible
     set_buffered_input(true);
     exit(signo);
 }
@@ -305,7 +304,7 @@ int main(int argc, char** argv){
             }else{
                 errx(EXIT_FAILURE, "speed must be a positive number");
             }
-            goto skip_comp;
+            goto skip_strcmp;
         }
         while(argv[1][i] != '\0'){
             argv[1][i] = tolower(argv[1][i]);
@@ -326,7 +325,7 @@ int main(int argc, char** argv){
         }
     }
 
-skip_comp:
+skip_strcmp:
     
     /*
         from www.man7.org/linux/man-pages/man2/signal.2.html
