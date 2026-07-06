@@ -93,6 +93,30 @@ bool scord_equals(scord_t a, scord_t b){
     return a.x == b.x && a.y == b.y;
 }
 
+void new_random_apple(scord_t* apple, scord_t snake[], uint8_t *size){
+        // TODO: make getting random apple position faster
+        bool in_snake = false;
+
+        do{
+            apple->x = rand() % (HEIGHT - SIZE_OF_CELL) + BORDER_SIZE;
+            apple->y = rand() % 
+                (WIDTH / SIZE_OF_CELL - SIZE_OF_CELL) + BORDER_SIZE;
+            in_snake = false;
+            for(uint8_t i = 0; i < *size; i++){
+                if(scord_equals(snake[0], *apple)){
+                    in_snake = true;
+                    break;
+                }
+            }
+        }while(in_snake);
+}
+
+void grow_snake(scord_t snake[], uint8_t *size, mcord_t dir){
+    snake[*size].x = snake[*size - 1].x + dir.x;
+    snake[*size].y = snake[*size - 1].y + dir.y;
+    *size += 1;
+}
+
 void draw_border(){
     uint8_t i, j;
     printf("\033[H"); // move cursor to 0, 0
@@ -188,30 +212,14 @@ uint8_t move_snake(scord_t snake[], uint8_t* size, scord_t* apple, mcord_t dir){
 
     if(scord_equals(snake[0], *apple)){
 
-
-        // TODO: make getting random apple position faster
-        bool in_snake;
-
-        do{
-            apple->x = rand() % (HEIGHT - SIZE_OF_CELL) + BORDER_SIZE;
-            apple->y = rand() % 
-                (WIDTH / SIZE_OF_CELL - SIZE_OF_CELL) + BORDER_SIZE;
-            in_snake = false;
-            for(i = 0; i < *size; i++){
-                if(scord_equals(snake[0], *apple)){
-                    in_snake = true;
-                    break;
-                }
-            }
-        }while(in_snake);
+        new_random_apple(apple, snake, size);
         
         uint16_t max_size = HEIGHT * (WIDTH / 2);
         if(*size + 1 > max_size){
             return 1;
         }
-        snake[*size].x = snake[*size - 1].x + dir.x;
-        snake[*size].y = snake[*size - 1].y + dir.y;
-        *size += 1;
+
+        grow_snake(snake, size, dir);
 
         SCORE++;
     }
