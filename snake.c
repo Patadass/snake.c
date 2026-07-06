@@ -34,13 +34,14 @@
 #include <errno.h>
 #include <err.h>
 
-#define SLOW   150
+#define SLOW 150
 #define MEDIUM 100
-#define FAST   50
+#define FAST 50
 
 const uint8_t HEIGHT = 20;
-const uint8_t WIDTH  = 40;
+const uint8_t WIDTH = 40;
 const uint8_t SIZE_OF_CELL = 2;
+const uint8_t BORDER_SIZE = 1;
 
 uint16_t SCORE = 0;
 
@@ -81,6 +82,15 @@ void init_game(scord_t snake[], uint8_t* size, scord_t* apple){
     init_apple(apple);
 
     srand(time(NULL)); // set seed for rand()
+}
+
+bool is_out_of_bounds(scord_t cord){
+    return cord.x * SIZE_OF_CELL + SIZE_OF_CELL >= WIDTH ||
+        cord.y + 1 >= HEIGHT;
+}
+
+bool scord_equals(scord_t a, scord_t b){
+    return a.x == b.x && a.y == b.y;
 }
 
 void draw_border(){
@@ -129,7 +139,8 @@ void draw_header(){
 
 void draw_apple(scord_t apple){
     printf("\033[31m"); // color red
-    printf("\033[%d;%dHO", apple.y + 1, apple.x * SIZE_OF_CELL + 1);
+    printf("\033[%d;%dHO", apple.y + BORDER_SIZE,
+            apple.x * SIZE_OF_CELL + BORDER_SIZE);
 }
 
 void draw_snake(scord_t snake[], uint8_t size){
@@ -137,9 +148,11 @@ void draw_snake(scord_t snake[], uint8_t size){
     /* print body then head, looks better when colliding head with body */
     printf("\033[32m"); // color green
     for(i = 1; i < size;i++){
-        printf("\033[%d;%dH[]", snake[i].y + 1, snake[i].x * SIZE_OF_CELL + 1);
+        printf("\033[%d;%dH[]", snake[i].y + BORDER_SIZE,
+                snake[i].x * SIZE_OF_CELL + BORDER_SIZE);
     }
-    printf("\033[%d;%dH()", snake[0].y + 1, snake[0].x * SIZE_OF_CELL + 1);
+    printf("\033[%d;%dH()", snake[0].y + BORDER_SIZE,
+            snake[0].x * SIZE_OF_CELL + BORDER_SIZE);
 
     printf("\033[0m"); // reset color
 }
@@ -150,7 +163,7 @@ void draw_game(scord_t snake[], uint8_t size, scord_t apple){
     draw_header();
     draw_apple(apple);
     draw_snake(snake, size);
-    fflush(stdout);    // force flush stdout
+    fflush(stdout); // force flush stdout
 }
 
 uint8_t EXIT_STATUS = 0;
@@ -159,7 +172,7 @@ void input_handle(int signo, siginfo_t* info, void* context){
     EXIT_STATUS = 0;
 
     int stat;
-    wait(&stat);                 // wait for child process that's listening for key press
+    wait(&stat); // wait for child process that's listening for key press
     int key = WEXITSTATUS(stat); // get key pressed
 
     EXIT_STATUS = key;
@@ -169,40 +182,31 @@ uint8_t move_snake(scord_t snake[], uint8_t* size, scord_t* apple, mcord_t dir){
 
     uint8_t i;
 
-    if(snake[0].x == 0){
-        return 1;
-    }
-    if(snake[0].y == 0){
-        return 1;
-    }
-    if(snake[0].x * 2 + 2 >= WIDTH){
-        return 1;
-    }
-    if(snake[0].y + 1 >= HEIGHT){
+    if(snake[0].x == 0 || snake[0].y == 0 || is_out_of_bounds(snake[0])){
         return 1;
     }
 
-    if(snake[0].x == apple->x && snake[0].y == apple->y){
+    if(scord_equals(snake[0], *apple)){
 
 
         // TODO: make getting random apple position faster
         bool in_snake;
 
         do{
-
-            apple->x = rand() % (HEIGHT - 2) + 1;
-            apple->y = rand() % (WIDTH / 2 - 2) + 1;
+            apple->x = rand() % (HEIGHT - SIZE_OF_CELL) + BORDER_SIZE;
+            apple->y = rand() % 
+                (WIDTH / SIZE_OF_CELL - SIZE_OF_CELL) + BORDER_SIZE;
             in_snake = false;
             for(i = 0; i < *size; i++){
-                if(snake[i].x == apple->x && snake[i].y == apple->y){
+                if(scord_equals(snake[0], *apple)){
                     in_snake = true;
                     break;
                 }
             }
-
         }while(in_snake);
         
-        if(*size + 1 > HEIGHT * (WIDTH / 2)){
+        uint16_t max_size = HEIGHT * (WIDTH / 2);
+        if(*size + 1 > max_size){
             return 1;
         }
         snake[*size].x = snake[*size - 1].x + dir.x;
@@ -213,7 +217,7 @@ uint8_t move_snake(scord_t snake[], uint8_t* size, scord_t* apple, mcord_t dir){
     }
 
     for(i = *size - 1; i >= 1; i--){
-        if(snake[0].x == snake[i].x && snake[0].y == snake[i].y){
+        if(scord_equals(snake[0], snake[i])){
             return 1; //collision with body
         }
         snake[i].x = snake[i - 1].x;
